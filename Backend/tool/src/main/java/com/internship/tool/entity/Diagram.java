@@ -3,10 +3,8 @@ package com.internship.tool.entity;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 @Entity
-@Data
 @Table(name = "diagram")
 public class Diagram {
 
@@ -20,7 +18,7 @@ public class Diagram {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String status; // NEW FIELD (important for project)
+    private String status;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -35,4 +33,6 @@ public class Diagram {
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    // Getters & Setters
 }

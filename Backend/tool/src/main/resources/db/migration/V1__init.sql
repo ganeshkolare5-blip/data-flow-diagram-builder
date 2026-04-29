@@ -1,4 +1,4 @@
-CREATE TABLE diagram (
+CREATE TABLE IF NOT EXISTS diagram (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,

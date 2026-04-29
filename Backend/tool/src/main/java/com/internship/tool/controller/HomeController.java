@@ -8,6 +8,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "Backend Connected Successfully 🚀";
+        return "Backend Connected Successfully ";
     }
 }
