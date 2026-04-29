@@ -20,6 +20,9 @@ public class Diagram {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(columnDefinition = "TEXT")
+    private String aiResult;
+
     private String status; // NEW FIELD (important for project)
 
     private LocalDateTime createdAt;
