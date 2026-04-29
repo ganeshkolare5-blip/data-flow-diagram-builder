@@ -18,7 +18,7 @@ public class DiagramController {
     // ✅ ROOT CHECK API
     @GetMapping("/")
     public String home() {
-        return "Backend Connected Successfully 🚀";
+        return "Backend Connected Successfully ";
     }
 
     @PostMapping("/create")

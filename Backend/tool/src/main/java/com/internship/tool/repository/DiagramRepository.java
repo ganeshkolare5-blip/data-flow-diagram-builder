@@ -10,7 +10,6 @@ import com.internship.tool.entity.Diagram;
 @Repository
 public interface DiagramRepository extends JpaRepository<Diagram, Long> {
 
-    // Custom methods (use later)
     List<Diagram> findByStatus(String status);
 
     List<Diagram> findByNameContainingIgnoreCase(String name);
