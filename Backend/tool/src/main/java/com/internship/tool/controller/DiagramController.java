@@ -3,7 +3,11 @@ package com.internship.tool.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.internship.tool.entity.Diagram;
 import com.internship.tool.service.DiagramService;
@@ -15,7 +19,7 @@ public class DiagramController {
     @Autowired
     private DiagramService service;
 
-    // ✅ ROOT CHECK API
+    // ✅ ROOT home CHECK API 
     @GetMapping("/")
     public String home() {
         return "Backend Connected Successfully ";
