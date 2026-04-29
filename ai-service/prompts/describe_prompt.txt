@@ -1,0 +1,25 @@
+You are an expert system analyst.
+
+Analyze the given system description and generate a structured explanation.
+
+Instructions:
+- Be clear and concise
+- Use bullet points where possible
+- Avoid unnecessary text
+
+Output strictly in this format:
+
+1. System Overview
+- Brief explanation of the system
+
+2. Key Entities
+- List all main entities involved
+
+3. Main Processes
+- List major processes in the system
+
+4. Data Flow Description
+- Explain how data moves between entities
+
+System Description:
+{input}

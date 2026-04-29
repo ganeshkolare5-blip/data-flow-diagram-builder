@@ -14,7 +14,21 @@ public class DiagramService {
     @Autowired
     private DiagramRepository repo;
 
+    @Autowired
+    private AiServiceClient aiClient;
+
     public Diagram create(Diagram d) {
+
+        String input = d.getName() + " " + d.getDescription();
+
+        String result = aiClient.getAiResponse(input);
+
+        if (result != null) {
+            d.setAiResult(result);
+        } else {
+            d.setAiResult("AI unavailable");
+        }
+
         return repo.save(d);
     }
 
