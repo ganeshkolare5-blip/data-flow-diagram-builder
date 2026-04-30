@@ -27,11 +27,11 @@ public class DiagramController {
 
     @PostMapping("/create")
     public Diagram create(@RequestBody Diagram d) {
-        return service.create(d);
+        return service.createDiagram(d);   // ✅ correct method name
     }
 
     @GetMapping("/all")
     public List<Diagram> getAll() {
-        return service.getAll();
+        return service.getAllDiagrams();   // ✅ correct method name
     }
 }

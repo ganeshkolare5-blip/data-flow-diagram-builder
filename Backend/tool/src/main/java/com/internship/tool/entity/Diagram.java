@@ -1,38 +1,24 @@
 package com.internship.tool.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "diagram")
 public class Diagram {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String name;
-
-    @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String status;
+    // ✅ getters & setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    @PrePersist
-    public void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
-    // Getters & Setters
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }
