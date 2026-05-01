@@ -3,35 +3,34 @@ package com.internship.tool.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;   // ✅ IMPORTANT import
 
 import com.internship.tool.entity.Diagram;
 import com.internship.tool.service.DiagramService;
+import com.internship.tool.dto.DiagramDTO;
 
 @RestController
-@RequestMapping("/api/diagram")
+@RequestMapping("/diagrams")
 public class DiagramController {
 
     @Autowired
     private DiagramService service;
 
-    // ✅ ROOT home CHECK API 
-    @GetMapping("/")
-    public String home() {
-        return "Backend Connected Successfully ";
+    // CREATE
+    @PostMapping
+    public Diagram create(@Valid @RequestBody DiagramDTO dto) {
+        Diagram diagram = new Diagram();
+        diagram.setName(dto.getName());
+        diagram.setDescription(dto.getDescription());
+
+        return service.createDiagram(diagram);  // ✅ FIXED
     }
 
-    @PostMapping("/create")
-    public Diagram create(@RequestBody Diagram d) {
-        return service.createDiagram(d);   // ✅ correct method name
-    }
-
-    @GetMapping("/all")
+    // GET ALL
+    @GetMapping
     public List<Diagram> getAll() {
-        return service.getAllDiagrams();   // ✅ correct method name
+        return service.getAllDiagrams();
     }
 }
