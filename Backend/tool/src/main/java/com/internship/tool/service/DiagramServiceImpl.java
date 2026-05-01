@@ -7,62 +7,42 @@ import org.springframework.stereotype.Service;
 
 import com.internship.tool.entity.Diagram;
 import com.internship.tool.repository.DiagramRepository;
-import com.internship.tool.exception.InvalidInputException;
-import com.internship.tool.exception.ResourceNotFoundException;
 
 @Service
 public class DiagramServiceImpl implements DiagramService {
 
     @Autowired
-    private DiagramRepository diagramRepository;
+    private DiagramRepository repository;
 
     @Override
     public Diagram createDiagram(Diagram diagram) {
-
-        if (diagram.getName() == null || diagram.getName().trim().isEmpty()) {
-            throw new InvalidInputException("Diagram name cannot be empty");
-        }
-
-        if (diagram.getName().length() < 3) {
-            throw new InvalidInputException("Diagram name must be at least 3 characters");
-        }
-
-        if (diagram.getDescription() != null && diagram.getDescription().length() > 500) {
-            throw new InvalidInputException("Description cannot exceed 500 characters");
-        }
-
-        return diagramRepository.save(diagram);
+        return repository.save(diagram);
     }
 
     @Override
     public List<Diagram> getAllDiagrams() {
-        return diagramRepository.findAll();
+        return repository.findAll();
     }
 
     @Override
     public Diagram getDiagramById(Long id) {
-        return diagramRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Diagram not found with id: " + id));
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Diagram not found"));
     }
 
     @Override
     public Diagram updateDiagram(Long id, Diagram updatedDiagram) {
-
-        Diagram existing = getDiagramById(id);
-
-        if (updatedDiagram.getName() == null || updatedDiagram.getName().trim().isEmpty()) {
-            throw new InvalidInputException("Diagram name cannot be empty");
-        }
+        Diagram existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Diagram not found"));
 
         existing.setName(updatedDiagram.getName());
-        existing.setDescription(updatedDiagram.getDescription());
+        existing.setDescription(updatedDiagram.getDescription()); // ✅ FIXED
 
-        return diagramRepository.save(existing);
+        return repository.save(existing);
     }
 
     @Override
     public void deleteDiagram(Long id) {
-        Diagram diagram = getDiagramById(id);
-        diagramRepository.delete(diagram);
+        repository.deleteById(id);
     }
 }

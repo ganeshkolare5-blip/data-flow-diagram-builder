@@ -27,6 +27,22 @@ public class DiagramController {
 
         return service.createDiagram(diagram);  // ✅ FIXED
     }
+    
+    @PutMapping("/{id}")
+    public Diagram update(@PathVariable Long id, @RequestBody Diagram diagram) {
+        return service.updateDiagram(id, diagram);
+    }
+    
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Long id) {
+        service.deleteDiagram(id);
+        return "Deleted Successfully";
+    }
+    
+    @GetMapping("/{id}")
+    public Diagram getDiagramById(@PathVariable Long id) {
+        return service.getDiagramById(id); 
+    }
 
     // GET ALL
     @GetMapping
