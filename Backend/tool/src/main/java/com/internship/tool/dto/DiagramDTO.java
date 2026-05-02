@@ -1,13 +1,18 @@
 package com.internship.tool.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class DiagramDTO {
 
     private Long id;
+    @NotBlank(message = "Name is required")
     private String name;
+    @NotBlank(message = "Description cannot be empty")
     private String description;
 
     // Default constructor
     public DiagramDTO() {}
+    
 
     // Parameterized constructor (optional)
     public DiagramDTO(Long id, String name, String description) {

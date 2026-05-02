@@ -1,12 +1,17 @@
 package com.internship.tool.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.internship.tool.entity.Diagram;
 import com.internship.tool.repository.DiagramRepository;
+import com.internship.tool.dto.DiagramDTO;
+import com.internship.tool.exception.ResourceNotFoundException;
+import com.internship.tool.exception.InvalidInputException;
 
 @Service
 public class DiagramServiceImpl implements DiagramService {
@@ -15,34 +20,51 @@ public class DiagramServiceImpl implements DiagramService {
     private DiagramRepository repository;
 
     @Override
-    public Diagram createDiagram(Diagram diagram) {
+    public Diagram saveDiagram(Diagram diagram) {
         return repository.save(diagram);
     }
 
     @Override
-    public List<Diagram> getAllDiagrams() {
-        return repository.findAll();
+    public Page<Diagram> getAllDiagrams(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override
+    @Cacheable(value = "diagrams", key = "#id")
     public Diagram getDiagramById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Diagram not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Diagram not found with ID: " + id));
     }
 
     @Override
-    public Diagram updateDiagram(Long id, Diagram updatedDiagram) {
-        Diagram existing = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Diagram not found"));
-
-        existing.setName(updatedDiagram.getName());
-        existing.setDescription(updatedDiagram.getDescription()); // ✅ FIXED
-
-        return repository.save(existing);
-    }
-
-    @Override
+    @CacheEvict(value = "diagrams", key = "#id")
     public void deleteDiagram(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Diagram not found with ID: " + id);
+        }
         repository.deleteById(id);
+    }
+    
+    @Override
+    @CacheEvict(value = "diagrams", key = "#diagram.id")
+    public Diagram updateDiagram(Diagram diagram) {
+        if (!repository.existsById(diagram.getId())) {
+            throw new ResourceNotFoundException("Diagram not found with ID: " + diagram.getId());
+        }
+        return repository.save(diagram);
+    }
+    
+    @Override
+    public Diagram createDiagram(DiagramDTO dto) {
+        // Business Logic Validation Example
+        if (!repository.findByNameContainingIgnoreCase(dto.getName()).isEmpty()) {
+            throw new InvalidInputException("A diagram with a similar name already exists");
+        }
+        
+        Diagram diagram = Diagram.builder()
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .build();
+        return repository.save(diagram);
     }
 }

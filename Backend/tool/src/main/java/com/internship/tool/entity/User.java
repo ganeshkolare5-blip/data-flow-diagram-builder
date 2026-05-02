@@ -9,26 +9,23 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "diagrams")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class Diagram {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
-    private String name;
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
 
-    @Column(length = 50)
-    private String role;
-
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    @Column(nullable = false)
+    private String password;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -37,4 +34,20 @@ public class Diagram {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

@@ -1,11 +1,14 @@
 package com.internship.tool.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
-import jakarta.validation.Valid;   // ✅ IMPORTANT import
+import jakarta.validation.Valid;
 
 import com.internship.tool.entity.Diagram;
 import com.internship.tool.service.DiagramService;
@@ -18,35 +21,29 @@ public class DiagramController {
     @Autowired
     private DiagramService service;
 
-    // CREATE
-    @PostMapping
-    public Diagram create(@Valid @RequestBody DiagramDTO dto) {
-        Diagram diagram = new Diagram();
-        diagram.setName(dto.getName());
-        diagram.setDescription(dto.getDescription());
-
-        return service.createDiagram(diagram);  // ✅ FIXED
-    }
-    
-    @PutMapping("/{id}")
-    public Diagram update(@PathVariable Long id, @RequestBody Diagram diagram) {
-        return service.updateDiagram(id, diagram);
-    }
-    
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
-        service.deleteDiagram(id);
-        return "Deleted Successfully";
-    }
-    
-    @GetMapping("/{id}")
-    public Diagram getDiagramById(@PathVariable Long id) {
-        return service.getDiagramById(id); 
-    }
-
-    // GET ALL
     @GetMapping
-    public List<Diagram> getAll() {
-        return service.getAllDiagrams();
+    public ResponseEntity<Page<Diagram>> getAll(@RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(service.getAllDiagrams(PageRequest.of(page, size)));
+    }
+    
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/{id}")
+    public ResponseEntity<Diagram> getDiagram(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getDiagramById(id));
+    }
+    
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDiagram(@PathVariable Long id) {
+        service.deleteDiagram(id);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PostMapping
+    public ResponseEntity<Diagram> createDiagram(@Valid @RequestBody DiagramDTO dto) {
+        Diagram created = service.createDiagram(dto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 }

@@ -1,17 +1,16 @@
 package com.internship.tool.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.internship.tool.entity.Diagram;
+import com.internship.tool.dto.DiagramDTO;
 
 public interface DiagramService {
-
-    Diagram createDiagram(Diagram diagram);
-
-    List<Diagram> getAllDiagrams();
-
+    Diagram saveDiagram(Diagram diagram);
+    Page<Diagram> getAllDiagrams(Pageable pageable);
     Diagram getDiagramById(Long id);
-
-    Diagram updateDiagram(Long id, Diagram diagram);
-
     void deleteDiagram(Long id);
+    Diagram updateDiagram(Diagram diagram);
+    Diagram createDiagram(DiagramDTO dto);
 }
