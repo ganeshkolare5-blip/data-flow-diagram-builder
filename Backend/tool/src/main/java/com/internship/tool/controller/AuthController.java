@@ -40,6 +40,9 @@ public class AuthController {
             throw new RuntimeException("Username is already taken");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("ROLE_USER");
+        }
         userRepository.save(user);
         return "User registered successfully";
     }
@@ -50,8 +53,8 @@ public class AuthController {
 
         if (dbUserOptional.isPresent() && passwordEncoder.matches(user.getPassword(), dbUserOptional.get().getPassword())) {
             Map<String, String> tokens = new HashMap<>();
-            tokens.put("accessToken", jwtUtil.generateToken(user.getUsername()));
-            tokens.put("refreshToken", jwtUtil.generateRefreshToken(user.getUsername()));
+            tokens.put("accessToken", jwtUtil.generateToken(user.getUsername(), dbUserOptional.get().getRole()));
+            tokens.put("refreshToken", jwtUtil.generateRefreshToken(user.getUsername(), dbUserOptional.get().getRole()));
             return tokens;
         }
 
@@ -64,10 +67,10 @@ public class AuthController {
         if (refreshToken != null) {
             try {
                 String username = jwtUtil.extractUsername(refreshToken);
+                String role = jwtUtil.extractRole(refreshToken);
                 if (jwtUtil.validateToken(refreshToken, username)) {
                     Map<String, String> tokens = new HashMap<>();
-                    tokens.put("accessToken", jwtUtil.generateToken(username));
-                    // Optional: generate a new refresh token or keep the old one
+                    tokens.put("accessToken", jwtUtil.generateToken(username, role));
                     return tokens;
                 }
             } catch (Exception e) {
