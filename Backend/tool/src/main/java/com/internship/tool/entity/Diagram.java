@@ -30,6 +30,12 @@ public class Diagram implements java.io.Serializable {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "user_email", length = 100)
+    private String userEmail;
+
+    @Column(name = "deadline")
+    private LocalDateTime deadline;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

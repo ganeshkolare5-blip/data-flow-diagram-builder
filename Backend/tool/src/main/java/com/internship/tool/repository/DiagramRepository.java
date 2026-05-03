@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.internship.tool.entity.Diagram;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Repository
 public interface DiagramRepository extends JpaRepository<Diagram, Long> {
@@ -17,4 +18,6 @@ public interface DiagramRepository extends JpaRepository<Diagram, Long> {
     
     @Query("SELECT d FROM Diagram d WHERE d.description IS NOT NULL AND d.description != ''")
     List<Diagram> findDiagramsWithDescription();
+
+    List<Diagram> findByDeadlineBetween(LocalDateTime start, LocalDateTime end);
 }
