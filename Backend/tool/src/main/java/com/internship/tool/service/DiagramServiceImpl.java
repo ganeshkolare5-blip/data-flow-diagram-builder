@@ -64,6 +64,8 @@ public class DiagramServiceImpl implements DiagramService {
         Diagram diagram = Diagram.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
+                .userEmail(dto.getUserEmail())
+                .deadline(dto.getDeadline())
                 .build();
         return repository.save(diagram);
     }

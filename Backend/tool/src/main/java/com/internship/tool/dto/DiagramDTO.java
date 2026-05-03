@@ -10,15 +10,20 @@ public class DiagramDTO {
     @NotBlank(message = "Description cannot be empty")
     private String description;
 
+    private String userEmail;
+    private java.time.LocalDateTime deadline;
+
     // Default constructor
     public DiagramDTO() {}
     
 
     // Parameterized constructor (optional)
-    public DiagramDTO(Long id, String name, String description) {
+    public DiagramDTO(Long id, String name, String description, String userEmail, java.time.LocalDateTime deadline) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.userEmail = userEmail;
+        this.deadline = deadline;
     }
 
     // Getters & Setters
@@ -44,5 +49,21 @@ public class DiagramDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public java.time.LocalDateTime getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(java.time.LocalDateTime deadline) {
+        this.deadline = deadline;
     }
 }
