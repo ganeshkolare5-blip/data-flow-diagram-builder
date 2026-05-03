@@ -21,7 +21,6 @@ public class DiagramController {
     @Autowired
     private DiagramService service;
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping
     public ResponseEntity<Page<Diagram>> getAll(@RequestParam(defaultValue = "0") int page,
                                                 @RequestParam(defaultValue = "10") int size) {

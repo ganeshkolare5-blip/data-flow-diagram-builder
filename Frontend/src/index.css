@@ -1,11 +1,18 @@
 :root {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Brand Polish - Day 12 */
+  --primary-color: #1B4F8A;
+  --bg-color: #f8f9fa;
+  --text-color: #333333;
+  --grid-unit: 8px;
+  --touch-target: 44px;
+  
+  font-family: 'Arial', sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: #1a1a1a;
-  background-color: #f8f9fa;
+  color: var(--text-color);
+  background-color: var(--bg-color);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -19,12 +26,14 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  /* 8px grid alignment */
+  padding: calc(var(--grid-unit) * 4);
 }
 
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: calc(var(--grid-unit) * 4);
   text-align: center;
   width: 100%;
 }
@@ -39,8 +48,8 @@ body {
 
 .error-content {
   background: white;
-  padding: 40px;
-  border-radius: 16px;
+  padding: calc(var(--grid-unit) * 5);
+  border-radius: calc(var(--grid-unit) * 2);
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
@@ -49,57 +58,56 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px;
+  padding: calc(var(--grid-unit) * 8);
   background: white;
-  border-radius: 20px;
+  border-radius: calc(var(--grid-unit) * 2.5);
   border: 2px dashed #e2e8f0;
   color: #64748b;
-  margin: 20px 0;
+  margin: calc(var(--grid-unit) * 3) 0;
 }
 
 .empty-state-icon {
   font-size: 48px;
-  margin-bottom: 16px;
+  margin-bottom: calc(var(--grid-unit) * 2);
 }
 
-button {
-  border-radius: 8px;
+button, a, input, select {
+  /* 44px touch targets */
+  min-height: var(--touch-target);
+  min-width: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  border-radius: calc(var(--grid-unit) * 1);
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+  padding: 0 calc(var(--grid-unit) * 2);
+  font-size: 16px;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--primary-color);
   color: white;
   cursor: pointer;
-  transition: all 0.25s;
+  transition: all 0.2s ease-in-out;
 }
 
 button:hover {
-  background-color: #333;
-  transform: translateY(-2px);
+  filter: brightness(1.2);
+  transform: translateY(-1px);
 }
 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+button:active {
+  transform: translateY(0);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    color: #f8f9fa;
-    background-color: #1a1a1a;
+    --bg-color: #121212;
+    --text-color: #e2e8f0;
   }
   .error-content, .empty-state {
-    background: #2d2d2d;
-    border-color: #444;
+    background: #1e1e1e;
+    border-color: #333;
     color: #cbd5e1;
-  }
-  button {
-    background-color: #f8f9fa;
-    color: #1a1a1a;
-  }
-  button:hover {
-    background-color: #e2e8f0;
   }
 }
