@@ -56,14 +56,16 @@ public class DiagramServiceImpl implements DiagramService {
     
     @Override
     public Diagram createDiagram(DiagramDTO dto) {
-        // Business Logic Validation Example
-        if (!repository.findByNameContainingIgnoreCase(dto.getName()).isEmpty()) {
-            throw new InvalidInputException("A diagram with a similar name already exists");
+        if (repository.existsByName(dto.getName())) {
+            throw new InvalidInputException("A diagram with name '" + dto.getName() + "' already exists");
         }
         
         Diagram diagram = Diagram.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
+                .role(dto.getRole())
+                .userEmail(dto.getUserEmail())
+                .deadline(dto.getDeadline())
                 .build();
         return repository.save(diagram);
     }

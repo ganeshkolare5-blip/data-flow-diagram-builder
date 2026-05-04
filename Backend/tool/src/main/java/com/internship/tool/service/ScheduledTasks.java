@@ -20,26 +20,24 @@ public class ScheduledTasks {
     private final DiagramRepository diagramRepository;
     private final EmailService emailService;
 
-    // Daily reminder at 9:00 AM
+    // Daily reminder at 9:00 AM - Grouped by User
     @Scheduled(cron = "0 0 9 * * ?")
     public void sendDailyReminder() {
-        log.info("Running daily reminder task");
-        // For demonstration, we could find diagrams created recently or just notify users to review their diagrams.
-        // Or if there's a daily task, implement logic here.
-        // Assuming we want to send a reminder to users who have active diagrams.
-        // Because we don't have a specific "active" status, let's just find all diagrams and notify their users (simplified).
-        // A better approach is to send one summary email per user, but here's a per-diagram example:
-        List<Diagram> allDiagrams = diagramRepository.findAll();
-        for (Diagram diagram : allDiagrams) {
-            if (diagram.getUserEmail() != null && !diagram.getUserEmail().isEmpty()) {
+        log.info("Running daily reminder task - Grouped by User");
+        
+        List<String> userEmails = diagramRepository.findDistinctUserEmails();
+        
+        for (String email : userEmails) {
+            List<Diagram> userDiagrams = diagramRepository.findByUserEmail(email);
+            if (!userDiagrams.isEmpty()) {
                 Map<String, Object> model = new HashMap<>();
-                model.put("diagramName", diagram.getName());
-                model.put("description", diagram.getDescription() != null ? diagram.getDescription() : "No description provided");
+                model.put("userName", email); // or extract from User entity if available
+                model.put("diagrams", userDiagrams);
                 
                 emailService.sendEmailWithTemplate(
-                        diagram.getUserEmail(),
-                        "Daily Reminder: Check your Diagram '" + diagram.getName() + "'",
-                        "daily-reminder",
+                        email,
+                        "Daily Summary: You have " + userDiagrams.size() + " diagrams",
+                        "daily-summary",
                         model
                 );
             }

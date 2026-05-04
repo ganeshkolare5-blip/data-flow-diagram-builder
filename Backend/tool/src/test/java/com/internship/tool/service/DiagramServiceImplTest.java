@@ -155,7 +155,7 @@ public class DiagramServiceImplTest {
     // 9. Test createDiagram (Success)
     @Test
     void testCreateDiagram_Success() {
-        when(repository.findByNameContainingIgnoreCase("New Diagram")).thenReturn(Collections.emptyList());
+        when(repository.existsByName("New Diagram")).thenReturn(false);
         
         Diagram expectedDiagram = Diagram.builder()
                 .id(2L)
@@ -169,21 +169,20 @@ public class DiagramServiceImplTest {
 
         assertNotNull(createdDiagram);
         assertEquals("New Diagram", createdDiagram.getName());
-        verify(repository, times(1)).findByNameContainingIgnoreCase("New Diagram");
+        verify(repository, times(1)).existsByName("New Diagram");
         verify(repository, times(1)).save(any(Diagram.class));
     }
 
     // 10. Test createDiagram (Duplicate Name throws InvalidInputException)
     @Test
     void testCreateDiagram_DuplicateName() {
-        when(repository.findByNameContainingIgnoreCase("New Diagram"))
-                .thenReturn(List.of(diagram)); // returning an existing list to simulate duplicate
+        when(repository.existsByName("New Diagram")).thenReturn(true);
 
         assertThrows(InvalidInputException.class, () -> {
             diagramService.createDiagram(diagramDTO);
         });
 
-        verify(repository, times(1)).findByNameContainingIgnoreCase("New Diagram");
+        verify(repository, times(1)).existsByName("New Diagram");
         verify(repository, never()).save(any(Diagram.class));
     }
 }

@@ -20,4 +20,11 @@ public interface DiagramRepository extends JpaRepository<Diagram, Long> {
     List<Diagram> findDiagramsWithDescription();
 
     List<Diagram> findByDeadlineBetween(LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT DISTINCT d.userEmail FROM Diagram d WHERE d.userEmail IS NOT NULL AND d.userEmail != ''")
+    List<String> findDistinctUserEmails();
+
+    List<Diagram> findByUserEmail(String userEmail);
+
+    boolean existsByName(String name);
 }

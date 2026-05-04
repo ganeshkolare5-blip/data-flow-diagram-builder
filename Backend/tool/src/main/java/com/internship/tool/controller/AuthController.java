@@ -40,9 +40,8 @@ public class AuthController {
             throw new RuntimeException("Username is already taken");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRole() == null || user.getRole().isEmpty()) {
-            user.setRole("ROLE_USER");
-        }
+        // Force ROLE_USER for public registration to prevent privilege escalation
+        user.setRole("ROLE_USER");
         userRepository.save(user);
         return "User registered successfully";
     }
