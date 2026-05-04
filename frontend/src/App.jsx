@@ -1,122 +1,156 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useContext, useState } from "react";
+import { AuthContext } from "./context/AuthContext";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import Dashboard from "./pages/Dashboard";
+import ListPage from "./pages/ListPage";
+import FormPage from "./pages/FormPage";
+import DetailPage from "./pages/DetailPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
+// View names: 'dashboard' | 'records' | 'detail' | 'create' | 'edit'
 function App() {
-  const [count, setCount] = useState(0)
+  const { token, setToken } = useContext(AuthContext);
 
+  // Auth screen toggle
+  const [showRegister, setShowRegister] = useState(false);
+
+  // Navigation state (replaces React Router for simplicity)
+  const [currentView, setCurrentView] = useState("dashboard");
+  const [selectedId, setSelectedId] = useState(null);
+
+  // ── Auth Handlers ───────────────────────────────────────
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setCurrentView("dashboard");
+  };
+
+  // ── Navigation Handlers ─────────────────────────────────
+  const goTo = (view, id = null) => {
+    setCurrentView(view);
+    setSelectedId(id);
+  };
+
+  // ── Not Logged In ────────────────────────────────────────
+  if (!token) {
+    if (showRegister) {
+      return <RegisterPage onGoToLogin={() => setShowRegister(false)} />;
+    }
+    return (
+      <LoginPage
+        setToken={setToken}
+        onGoToRegister={() => setShowRegister(true)}
+      />
+    );
+  }
+
+  // ── Nav tabs config ──────────────────────────────────────
+  const NAV_TABS = [
+    { id: "dashboard", label: "📊 Dashboard" },
+    { id: "records",   label: "📋 Records"   },
+    { id: "create",    label: "➕ Create"    },
+  ];
+
+  // ── Render Active View ───────────────────────────────────
+  const renderView = () => {
+    switch (currentView) {
+      case "dashboard":
+        return <Dashboard />;
+
+      case "records":
+        return (
+          <ListPage
+            onView={(id) => goTo("detail", id)}
+            onEdit={(id) => goTo("edit", id)}
+          />
+        );
+
+      case "create":
+        return (
+          <FormPage
+            onSaved={() => goTo("records")}
+          />
+        );
+
+      case "edit":
+        return (
+          <div>
+            <button
+              onClick={() => goTo("records")}
+              className="text-blue-500 hover:underline text-sm mb-4 flex items-center gap-1"
+            >
+              ← Back to Records
+            </button>
+            <FormPage
+              editId={selectedId}
+              onSaved={() => goTo("records")}
+            />
+          </div>
+        );
+
+      case "detail":
+        return (
+          <DetailPage
+            id={selectedId}
+            onBack={() => goTo("records")}
+            onEdit={(id) => goTo("edit", id)}
+          />
+        );
+
+      default:
+        return <Dashboard />;
+    }
+  };
+
+  // ── Logged In Layout ─────────────────────────────────────
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        {/* Top Navigation Bar */}
+        <header className="bg-white shadow-sm border-b border-gray-200">
+          <div className="container mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
+            {/* Logo */}
+            <span className="text-lg font-bold text-blue-600 select-none">
+              📊 DFD Builder
+            </span>
 
-      <div className="ticks"></div>
+            {/* Nav Tabs */}
+            <nav className="flex gap-1">
+              {NAV_TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  id={`nav-${tab.id}`}
+                  onClick={() => goTo(tab.id)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    currentView === tab.id
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+            {/* Logout */}
+            <button
+              id="logout-btn"
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded text-sm font-medium transition"
+            >
+              Logout
+            </button>
+          </div>
+        </header>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        {/* Main Content */}
+        <main className="container mx-auto max-w-5xl px-4 py-6">
+          {renderView()}
+        </main>
+      </div>
+    </ProtectedRoute>
+  );
 }
 
-export default App
+export default App;
