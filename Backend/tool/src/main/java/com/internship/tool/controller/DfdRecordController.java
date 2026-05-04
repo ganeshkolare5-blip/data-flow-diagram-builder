@@ -3,6 +3,7 @@ package com.internship.tool.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,41 +25,60 @@ public class DfdRecordController {
 
     @Autowired
     private DfdRecordService service;
-    
+
     @Autowired
     private DfdRecordRepository repository;
 
-    @GetMapping("/")
-    public String home() {
-        return "Backend Connected Successfully";
-    }
-
+    // ─── POST /create → 201 CREATED ───────────────────────────────────────────
     @PostMapping("/create")
-    public DfdRecord create(@RequestBody DfdRecord record) {
-        return service.create(record);
+    public ResponseEntity<DfdRecord> create(@RequestBody DfdRecord record) {
+        DfdRecord saved = service.create(record);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    // ─── GET /all → 200 OK ────────────────────────────────────────────────────
     @GetMapping("/all")
-    public List<DfdRecord> getAll() {
-        return service.getAll();
+    public ResponseEntity<List<DfdRecord>> getAll() {
+        return ResponseEntity.ok(service.getAll());
     }
 
+    // ─── GET /{id} → 200 OK or 404 NOT FOUND ──────────────────────────────────
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        return repository.findById(id)
+                .filter(r -> !Boolean.TRUE.equals(r.getDeleted()))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    // ─── PUT /{id} → 200 OK or 404 NOT FOUND ──────────────────────────────────
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
             @RequestBody DfdRecord updatedRecord
     ) {
-        return ResponseEntity.ok(service.update(id, updatedRecord));
+        try {
+            return ResponseEntity.ok(service.update(id, updatedRecord));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Record not found");
+        }
     }
 
+    // ─── DELETE /{id} → 200 OK or 404 NOT FOUND ───────────────────────────────
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        service.softDelete(id);
-        return ResponseEntity.ok("Deleted successfully");
+        try {
+            service.softDelete(id);
+            return ResponseEntity.ok("Deleted successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Record not found");
+        }
     }
 
+    // ─── GET /search?q= → 200 OK ──────────────────────────────────────────────
     @GetMapping("/search")
-    public List<DfdRecord> search(@RequestParam String q) {
-        return repository.findByTitleContainingIgnoreCaseAndDeletedFalse(q);
+    public ResponseEntity<List<DfdRecord>> search(@RequestParam String q) {
+        List<DfdRecord> results = repository.findByTitleContainingIgnoreCaseAndDeletedFalse(q);
+        return ResponseEntity.ok(results);
     }
 }
