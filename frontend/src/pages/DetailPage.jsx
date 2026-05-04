@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import AIPanel from "../components/AIPanel";
 
 function DetailPage({ id, onBack, onEdit }) {
   const [data, setData] = useState(null);
@@ -107,6 +108,9 @@ function DetailPage({ id, onBack, onEdit }) {
           </button>
         </div>
       </div>
+
+      {/* ── AI Panel ────────────────────────────────────── */}
+      <AIPanel description={data.description} />
     </div>
   );
 }
