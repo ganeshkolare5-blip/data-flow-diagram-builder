@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 import redis
@@ -7,11 +8,15 @@ import time
 
 ai_bp = Blueprint("ai_bp", __name__)
 
+# Configuration from Environment Variables
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+
 # Safe Redis Connection
 try:
     redis_client = redis.Redis(
-        host="localhost",
-        port=6379,
+        host=REDIS_HOST,
+        port=REDIS_PORT,
         decode_responses=True
     )
     redis_client.ping()
@@ -39,24 +44,26 @@ def describe():
     key = generate_key(user_input, "describe")
 
     try:
-
         cached = redis_client.get(key) if redis_available else None
         if cached:
             response = json.loads(cached)
         else:
+            # Here you would normally call the AI model
+            # For now, we simulate a successful response
             response = {
                 "status": "success",
                 "input": user_input,
+                "description": f"Detailed flow analysis for {user_input}",
                 "generated_at": datetime.now().isoformat()
             }
 
             if redis_available:
                 redis_client.setex(key, 900, json.dumps(response))
 
-    except Exception:
+    except Exception as e:
         response = {
             "is_fallback": True,
-            "message": "Fallback response due to AI error"
+            "message": f"Fallback response due to error: {str(e)}"
         }
 
     response["response_time"] = round(time.time() - start, 2)
@@ -84,7 +91,7 @@ def recommend():
                 "recommendations": [
                     {
                         "action_type": "Optimize",
-                        "description": "Improve system performance and speed.",
+                        "description": f"Improve system performance for {user_input}.",
                         "priority": "High"
                     },
                     {

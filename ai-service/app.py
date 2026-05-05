@@ -1,44 +1,52 @@
+import os
+import redis
+import time
 from sentence_transformers import SentenceTransformer
 from flask import Flask, jsonify
 from routes.ai_routes import ai_bp
-import time
-import redis
 
 app = Flask(__name__)
-print("Loading AI model...")
-model = SentenceTransformer('all-MiniLM-L6-v2')
+
+# Configuration from Environment Variables
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+MODEL_NAME = os.getenv("MODEL_NAME", "all-MiniLM-L6-v2")
+
+print(f"Loading AI model: {MODEL_NAME}...")
+model = SentenceTransformer(MODEL_NAME)
 print("Model loaded successfully")
-app.register_blueprint(ai_bp)
-@app.route("/")
-def home():
-    return {"message": "AI Service Running"}
 
 # service start time
 start_time = time.time()
 
-# Redis connection
+# Global Redis client (can be imported by routes)
 redis_client = redis.Redis(
-    host="localhost",
-    port=6379,
+    host=REDIS_HOST,
+    port=REDIS_PORT,
     decode_responses=True
 )
 
-MODEL_NAME = "llama3-70b-8192"
-avg_response_time = 1.4
+app.register_blueprint(ai_bp)
 
+@app.route("/")
+def home():
+    return {"message": "AI Service Running", "model": MODEL_NAME}
 
 @app.route("/health")
 def health():
     uptime = int(time.time() - start_time)
+    try:
+        redis_client.ping()
+        redis_status = "connected"
+    except:
+        redis_status = "disconnected"
 
-    resp = jsonify({
+    return jsonify({
         "status": "healthy",
         "model": MODEL_NAME,
-        "avg_response_time": f"{avg_response_time} sec",
+        "redis": redis_status,
         "uptime": f"{uptime} seconds"
     })
-
-    return resp
 
 @app.after_request
 def add_security_headers(response):
@@ -47,18 +55,16 @@ def add_security_headers(response):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Content-Security-Policy"] = (
-    "default-src 'self'; "
-    "script-src 'self'; "
-    "style-src 'self'; "
-    "img-src 'self' data:; "
-    "object-src 'none'; "
-    "base-uri 'self'; "
-    "frame-ancestors 'none'"
-)
-
-    # 🔥 REMOVE default server header completely
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self'; "
+        "img-src 'self' data:; "
+        "object-src 'none'; "
+        "base-uri 'self'; "
+        "frame-ancestors 'none'"
+    )
     response.headers["Server"] = "SecureServer"
-
     return response
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
