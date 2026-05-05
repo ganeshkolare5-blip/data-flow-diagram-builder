@@ -26,3 +26,6 @@ Thumbs.db
 # Project specific
 ai-service/__pycache__/
 ai-service/venv/
+.env
+__pycache__/
+*.pyc

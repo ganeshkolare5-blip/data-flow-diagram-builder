@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: postgres:15-alpine
@@ -13,6 +15,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - dfd-network
 
@@ -60,9 +64,9 @@ services:
       dockerfile: Dockerfile
     container_name: dfd-ai-service
     ports:
-      - "8000:8000"
+      - "5000:5000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -80,6 +84,9 @@ services:
       - backend
     networks:
       - dfd-network
+
+volumes:
+  postgres_data:
 
 networks:
   dfd-network:

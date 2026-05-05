@@ -1,8 +1,15 @@
-CREATE TABLE IF NOT EXISTS diagram (
+CREATE TABLE dfd_records (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+
+    title VARCHAR(255) NOT NULL,
     description TEXT,
+
     status VARCHAR(50),
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    priority VARCHAR(50),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_status ON dfd_records(status);
+CREATE INDEX idx_created_at ON dfd_records(created_at);
